@@ -1,15 +1,20 @@
-import type { RuleEntry, CreateAbilityFromBitsOptions, Ability, WithSubjectType } from "./types";
+import type {
+  RuleEntry,
+  CreateAbilityFromBitsOptions,
+  Ability,
+  WithSubjectType,
+} from "./types";
 import type { RawRule } from "@casl/ability";
 import type { BitField } from "fbit-field";
 
 import { createMongoAbility } from "@casl/ability";
+import { ZERO_BIT } from "fbit-field";
 import {
   extractBigInt,
   defaultBitSort,
   resolveConditions,
   getMapRuleEntryAndValidateBits,
 } from "./utils";
-import { ZERO_BIT } from "fbit-field";
 
 export const createAbilityFromBits = (
   bits: bigint | BitField,
@@ -74,5 +79,3 @@ export const createAbilityFromBits = (
 
   return ability;
 };
-
-export default createAbilityFromBits;

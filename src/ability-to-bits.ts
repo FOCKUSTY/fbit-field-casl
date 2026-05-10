@@ -1,12 +1,12 @@
-import type { AnyAbility, PureAbility, RawRule, SubjectType } from "@casl/ability";
-
+import type { RawRule } from "@casl/ability";
 import type { RuleEntry, AbilityToBitsOptions, Ability } from "./types";
+
 import { ZERO_BIT } from "fbit-field";
 
 /**
  * Ищет в карте биты, чей id совпадает с переданным.
  */
-const collectCandidatesById = (
+export const collectCandidatesById = (
   ruleId: string,
   map: Map<bigint, RuleEntry>,
 ): bigint[] => {
@@ -25,7 +25,10 @@ const collectCandidatesById = (
  * Проверяет, соответствует ли запись карты правилу CASL
  * (только для резервного метода, без учёта id).
  */
-const isEntryMatchingRule = (entry: RuleEntry, rule: RawRule): boolean => {
+export const isEntryMatchingRule = (
+  entry: RuleEntry,
+  rule: RawRule,
+): boolean => {
   if (entry.action !== rule.action) {
     return false;
   }
@@ -56,7 +59,7 @@ const isEntryMatchingRule = (entry: RuleEntry, rule: RawRule): boolean => {
  * Ищет в карте биты, соответствующие правилу по action, subject, fields.
  * Инвертированные правила и правила с функциями-условиями пропускаются.
  */
-const collectCandidatesByMatch = (
+export const collectCandidatesByMatch = (
   rule: RawRule,
   map: Map<bigint, RuleEntry>,
 ): bigint[] => {
@@ -71,7 +74,7 @@ const collectCandidatesByMatch = (
   return candidates;
 };
 
-const getConditionsRuleId = (conditions: unknown): string | null => {
+export const getConditionsRuleId = (conditions: unknown): string | null => {
   if (!conditions) {
     return null;
   }
@@ -97,7 +100,7 @@ const getConditionsRuleId = (conditions: unknown): string | null => {
  * Приоритетный метод: по `__ruleId` в условиях.
  * Резервный метод: по action, subject и fields.
  */
-const findBitForRule = (
+export const findBitForRule = (
   rule: RawRule,
   map: Map<bigint, RuleEntry>,
   options: AbilityToBitsOptions,
@@ -136,7 +139,7 @@ const findBitForRule = (
 };
 
 /** Сравнение двух массивов строк (игнорируя порядок). */
-const areArraysEqual = (a: string[], b: string[]): boolean => {
+export const areArraysEqual = (a: string[], b: string[]): boolean => {
   if (a.length !== b.length) {
     return false;
   }
@@ -171,5 +174,3 @@ export const abilityToBits = (
 
   return result;
 };
-
-export default abilityToBits;

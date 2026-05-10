@@ -18,12 +18,12 @@ export interface Rule {
 }
 
 export type WithSubjectType<T> = T & {
-  subject: SubjectType | SubjectType[]
-}
+  subject: SubjectType | SubjectType[];
+};
 
 export type Ability = AnyAbility & {
-  rules: WithSubjectType<AnyAbility["rules"][number]>[]
-}
+  rules: WithSubjectType<AnyAbility["rules"][number]>[];
+};
 
 export interface CreateAbilityFromBitsOptions {
   /** Фабрика для создания ability (по умолчанию createMongoAbility) */

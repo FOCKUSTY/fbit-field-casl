@@ -46,5 +46,3 @@ export const bitsToRulesList = (
 
   return array;
 };
-
-export default bitsToRulesList;
