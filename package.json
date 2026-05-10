@@ -1,0 +1,56 @@
+{
+  "name": "@fbit-field/casl",
+  "version": "0.1.0",
+  "description": "Integration between fbit-field and CASL: compact bigint-based permissions with seamless bidirectional conversion",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "sideEffect": false,
+  "module": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-mocha ./test/**/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "casl",
+    "bitfield",
+    "permissions",
+    "rbac",
+    "bigint",
+    "typescript",
+    "serialization"
+  ],
+  "author": "FOCKUSTY",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FOCKUSTY/fbit-field-casl.git"
+  },
+  "peerDependencies": {
+    "@casl/ability": "^6.0.0",
+    "fbit-field": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.12.2",
+    "mocha": "^11.7.0",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}
