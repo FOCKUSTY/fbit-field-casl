@@ -1,0 +1,1 @@
+export const RULE_ID_KEY = "__ruleId";

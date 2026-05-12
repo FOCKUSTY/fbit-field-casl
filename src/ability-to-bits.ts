@@ -1,176 +1,146 @@
+import type { Ability, AbilityToBitsOptions, RuleConditions, RuleEntry, RuleMap } from "./types";
 import type { RawRule } from "@casl/ability";
-import type { RuleEntry, AbilityToBitsOptions, Ability } from "./types";
 
 import { ZERO_BIT } from "fbit-field";
+import { RULE_ID_KEY } from "./constants";
+import { areArraysEqual } from "./utils";
 
-/**
- * Ищет в карте биты, чей id совпадает с переданным.
- */
-export const collectCandidatesById = (
-  ruleId: string,
-  map: Map<bigint, RuleEntry>,
-): bigint[] => {
-  const candidates: bigint[] = [];
+export class AbilityTransformer<
+  const Context,
+  const Conditions extends RuleConditions<Context>
+> {
+  public constructor(
+    public readonly ability: Ability,
+    public readonly ruleMap: RuleMap<Context, Conditions>,
+  ) {}
 
-  for (const [bit, entry] of map) {
-    if (entry.id === ruleId) {
-      candidates.push(bit);
-    }
-  }
+  public execute(options: AbilityToBitsOptions = {}): bigint {
+    let result = ZERO_BIT;
 
-  return candidates;
-};
+    for (const rule of this.ability.rules) {
+      const bit = this.findBitForRule(rule, options);
+      if (bit === null) {
+        continue;
+      }
 
-/**
- * Проверяет, соответствует ли запись карты правилу CASL
- * (только для резервного метода, без учёта id).
- */
-export const isEntryMatchingRule = (
-  entry: RuleEntry,
-  rule: RawRule,
-): boolean => {
-  if (entry.action !== rule.action) {
-    return false;
-  }
-
-  if (entry.subject !== rule.subject) {
-    return false;
-  }
-
-  const entryFields = entry.fields ?? [];
-  const ruleFields = (rule as any).fields ?? [];
-
-  if (!areArraysEqual(entryFields, ruleFields)) {
-    return false;
-  }
-
-  if (entry.isInverted) {
-    return false;
-  }
-
-  if (typeof entry.conditions === "function") {
-    return false;
-  }
-
-  return true;
-};
-
-/**
- * Ищет в карте биты, соответствующие правилу по action, subject, fields.
- * Инвертированные правила и правила с функциями-условиями пропускаются.
- */
-export const collectCandidatesByMatch = (
-  rule: RawRule,
-  map: Map<bigint, RuleEntry>,
-): bigint[] => {
-  const candidates: bigint[] = [];
-
-  for (const [bit, entry] of map) {
-    if (isEntryMatchingRule(entry, rule)) {
-      candidates.push(bit);
-    }
-  }
-
-  return candidates;
-};
-
-export const getConditionsRuleId = (conditions: unknown): string | null => {
-  if (!conditions) {
-    return null;
-  }
-
-  if (typeof conditions !== "object") {
-    return null;
-  }
-
-  const hasConditionsRuleId = "__ruleId" in conditions;
-  if (!hasConditionsRuleId) {
-    return null;
-  }
-
-  if (typeof conditions.__ruleId !== "string") {
-    return null;
-  }
-
-  return conditions.__ruleId as string;
-};
-
-/**
- * Ищет бит, соответствующий правилу CASL, в карте.
- * Приоритетный метод: по `__ruleId` в условиях.
- * Резервный метод: по action, subject и fields.
- */
-export const findBitForRule = (
-  rule: RawRule,
-  map: Map<bigint, RuleEntry>,
-  options: AbilityToBitsOptions,
-): bigint | null => {
-  if (options.isStrict) {
-    throw new Error(
-      `Ambiguous rule mapping: multiple bits found for rule ${rule.action} ${rule.subject}`,
-    );
-  }
-
-  const ruleId = getConditionsRuleId(rule.conditions);
-  const candidates = (() => {
-    if (ruleId) {
-      return collectCandidatesById(ruleId, map);
-    }
-
-    return collectCandidatesByMatch(rule, map);
-  })();
-
-  if (candidates.length === 0) {
-    return null;
-  }
-
-  if (candidates.length === 1) {
-    return candidates[0];
-  }
-
-  candidates.sort((a, b) => {
-    if (a > b) return 1;
-    if (a < b) return -1;
-
-    return 0;
-  });
-
-  return candidates[0];
-};
-
-/** Сравнение двух массивов строк (игнорируя порядок). */
-export const areArraysEqual = (a: string[], b: string[]): boolean => {
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  const sortedA = [...a].sort();
-  const sortedB = [...b].sort();
-
-  return sortedA.every((val, idx) => val === sortedB[idx]);
-};
-
-/**
- * Преобразует правила CASL обратно в bigint на основе карты соответствия.
- *
- * @param ability - Экземпляр PureAbility
- * @param map - Карта бит → правило
- * @param options - Настройки (строгий режим и пр.)
- * @returns bigint, представляющий объединение битов найденных правил
- */
-export const abilityToBits = (
-  ability: Ability,
-  map: Map<bigint, RuleEntry>,
-  options: AbilityToBitsOptions = {},
-): bigint => {
-  let result = ZERO_BIT;
-
-  for (const rule of ability.rules) {
-    const bit = findBitForRule(rule, map, options);
-    if (bit !== null) {
       result |= bit;
     }
+
+    return result;
   }
 
-  return result;
-};
+  public isRuleMatchindRawRule(rule: RuleEntry<Context, Conditions>, rawRule: RawRule) {
+    if (rule.action !== rawRule.action) {
+      return false;
+    }
+
+    if (rule.subject !== rawRule.subject) {
+      return false;
+    }
+
+    const rawRuleFields = rawRule.fields ?? [];
+    if (typeof rawRuleFields === "string") {
+      return false;
+    }
+
+    const ruleFields = rule.fields ?? [];
+    if (!areArraysEqual(ruleFields, rawRuleFields)) {
+      return false;
+    }
+
+    if (rule.isInverted) {
+      return false;
+    }
+
+    if (typeof rule.conditions === "function") {
+      return false;
+    }
+
+    return true;
+  }
+
+  private collectMapCandidates(callback: ({
+    bit,
+    rule
+  }: {
+    bit: bigint,
+    rule: RuleEntry<Context, Conditions>,
+  }) => boolean) {
+    const candidates = this.mapRuleMap((bit, rule) => {
+      if (callback({ bit, rule })) {
+        return bit;
+      }
+
+      return null;
+    }, null);
+
+    return candidates;
+  }
+
+  private collectMapCandidatesByMatch(rawRule: RawRule): bigint[] {
+    return this.collectMapCandidates(({ rule }) => this.isRuleMatchindRawRule(rule, rawRule));
+  }
+
+  private collectMapCandidatesById(ruleId: string): bigint[] {
+    return this.collectMapCandidates(({ rule }) => rule.id === ruleId);
+  }
+
+  private mapRuleMap<const T, const K>(callback: (bit: bigint, rule: RuleEntry<Context, Conditions>) => T|K, filterValue: K) {
+    const array: Exclude<T, K>[] = [];
+
+    for (const [bit, rule] of this.ruleMap) {
+      const value = callback(bit, rule);
+      if (value === filterValue) {
+        context;
+      }
+
+      array.push(value as Exclude<T, K>);
+    }
+
+    return array;
+  }  
+
+  private getConditionsRuleId(conditions: unknown): string | null {
+    if (!conditions) {
+      return null;
+    }
+
+    if (typeof conditions !== "object") {
+      return null;
+    }
+
+    const hasConditionsRuleId = RULE_ID_KEY in conditions;
+    if (!hasConditionsRuleId) {
+      return null;
+    }
+
+    if (typeof conditions.__ruleId !== "string") {
+      return null;
+    }
+
+    return conditions.__ruleId as string;
+  }
+
+  private findBitForRule(rule: RawRule, options: AbilityToBitsOptions) {
+    if (options.isStrict) {
+      throw new Error(
+        `Ambiguous rule mapping: multiple bits found for rule ${rule.action} ${rule.subject}`,
+      );
+    };
+
+    const ruleId = this.getConditionsRuleId(rule.conditions);
+    const candidates = (() => {
+      if (ruleId) {
+        return this.collectMapCandidatesById(ruleId);
+      }
+
+      return this.collectMapCandidatesByMatch(rule);
+    })();
+
+    if (candidates.length === 0) {
+      return null;
+    }
+
+    return candidates.sort()[0];
+  }
+}

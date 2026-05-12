@@ -1,33 +1,32 @@
-import type { BitField } from "fbit-field";
-import { RuleEntry } from "./types";
+import { Bit, BitField, BitFieldOperations } from "fbit-field";
+import type { RuleConditions, RuleEntry } from "./types";
 
 /**
  * Извлекает значение bigint из переданных данных.
  * Если передан экземпляр BitField, возвращает его поле `bit`.
  */
-export const extractBigInt = (bits: bigint | BitField): bigint => {
-  if (typeof bits === "bigint") {
-    return bits;
-  }
-
-  return bits.bit;
+export const extractBigInt = (bits: Bit | BitField): bigint => {
+  return BitFieldOperations.toBigInt(bits);
 };
 
 /**
  * Сортировка битов по возрастанию (по умолчанию).
  */
-export const defaultBitSort = (a: bigint, b: bigint): number => {
+export const defaultBitsSort = (a: bigint, b: bigint): number => {
   if (a < b) return -1;
   if (a > b) return 1;
 
   return 0;
 };
 
-export const resolveConditions = ({
+export const resolveRuleConditions = <
+  const Context,
+  const Conditions extends RuleConditions<Context>
+>({
   rule,
   context,
 }: {
-  rule: RuleEntry;
+  rule: RuleEntry<Context, Conditions>;
   context: any;
 }) => {
   if (typeof rule.conditions === "function") {
@@ -37,37 +36,28 @@ export const resolveConditions = ({
   return rule.conditions;
 };
 
-export const isBitsValided = ({
+export const isBitValid = ({
   bit,
-  rawValue,
+  bits,
 }: {
-  rawValue: bigint;
+  bits: bigint;
   bit: bigint;
 }) => {
-  if (!(rawValue & bit)) {
+  if (!(bits & bit)) {
     return false;
   }
 
   return true;
 };
 
-export const getMapRuleEntryAndValidateBits = ({
-  bit,
-  rawValue,
-  map,
-}: {
-  rawValue: bigint;
-  bit: bigint;
-  map: Map<bigint, RuleEntry>;
-}) => {
-  if (!isBitsValided({ bit, rawValue })) {
-    return null;
+/** Сравнение двух массивов строк (игнорируя порядок). */
+export const areArraysEqual = (a: string[], b: string[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
   }
 
-  const entry = map.get(bit);
-  if (!entry) {
-    return null;
-  }
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
 
-  return entry;
+  return sortedA.every((val, idx) => val === sortedB[idx]);
 };
