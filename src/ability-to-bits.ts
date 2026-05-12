@@ -1,4 +1,10 @@
-import type { Ability, AbilityToBitsOptions, RuleConditions, RuleEntry, RuleMap } from "./types";
+import type {
+  Ability,
+  AbilityToBitsOptions,
+  RuleConditions,
+  RuleEntry,
+  RuleMap
+} from "./types";
 import type { RawRule } from "@casl/ability";
 
 import { ZERO_BIT } from "fbit-field";
@@ -11,7 +17,7 @@ export class AbilityTransformer<
 > {
   public constructor(
     public readonly ability: Ability,
-    public readonly ruleMap: RuleMap<Context, Conditions>,
+    public readonly ruleMap: RuleMap<Context, Conditions>
   ) {}
 
   public execute(options: AbilityToBitsOptions = {}): bigint {
@@ -29,7 +35,10 @@ export class AbilityTransformer<
     return result;
   }
 
-  public isRuleMatchindRawRule(rule: RuleEntry<Context, Conditions>, rawRule: RawRule) {
+  public isRuleMatchindRawRule(
+    rule: RuleEntry<Context, Conditions>,
+    rawRule: RawRule
+  ) {
     if (rule.action !== rawRule.action) {
       return false;
     }
@@ -59,13 +68,15 @@ export class AbilityTransformer<
     return true;
   }
 
-  private collectMapCandidates(callback: ({
-    bit,
-    rule
-  }: {
-    bit: bigint,
-    rule: RuleEntry<Context, Conditions>,
-  }) => boolean) {
+  private collectMapCandidates(
+    callback: ({
+      bit,
+      rule
+    }: {
+      bit: bigint;
+      rule: RuleEntry<Context, Conditions>;
+    }) => boolean
+  ) {
     const candidates = this.mapRuleMap((bit, rule) => {
       if (callback({ bit, rule })) {
         return bit;
@@ -78,14 +89,19 @@ export class AbilityTransformer<
   }
 
   private collectMapCandidatesByMatch(rawRule: RawRule): bigint[] {
-    return this.collectMapCandidates(({ rule }) => this.isRuleMatchindRawRule(rule, rawRule));
+    return this.collectMapCandidates(({ rule }) =>
+      this.isRuleMatchindRawRule(rule, rawRule)
+    );
   }
 
   private collectMapCandidatesById(ruleId: string): bigint[] {
     return this.collectMapCandidates(({ rule }) => rule.id === ruleId);
   }
 
-  private mapRuleMap<const T, const K>(callback: (bit: bigint, rule: RuleEntry<Context, Conditions>) => T|K, filterValue: K) {
+  private mapRuleMap<const T, const K>(
+    callback: (bit: bigint, rule: RuleEntry<Context, Conditions>) => T | K,
+    filterValue: K
+  ) {
     const array: Exclude<T, K>[] = [];
 
     for (const [bit, rule] of this.ruleMap) {
@@ -98,7 +114,7 @@ export class AbilityTransformer<
     }
 
     return array;
-  }  
+  }
 
   private getConditionsRuleId(conditions: unknown): string | null {
     if (!conditions) {
@@ -124,9 +140,9 @@ export class AbilityTransformer<
   private findBitForRule(rule: RawRule, options: AbilityToBitsOptions) {
     if (options.isStrict) {
       throw new Error(
-        `Ambiguous rule mapping: multiple bits found for rule ${rule.action} ${rule.subject}`,
+        `Ambiguous rule mapping: multiple bits found for rule ${rule.action} ${rule.subject}`
       );
-    };
+    }
 
     const ruleId = this.getConditionsRuleId(rule.conditions);
     const candidates = (() => {

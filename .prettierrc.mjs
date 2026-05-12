@@ -1,4 +1,4 @@
-import config from '@lazy-and-focused/prettier-config';
+import config from "@lazy-and-focused/prettier-config";
 
 /**
  * @see  https:\\prettier.io\docs\configuration
@@ -11,5 +11,5 @@ export default {
   quoteProps: "preserve",
   trailingComma: "none",
   htmlWhitespaceSensitivity: "ignore",
-  proseWrap: "preserve",
+  proseWrap: "preserve"
 };

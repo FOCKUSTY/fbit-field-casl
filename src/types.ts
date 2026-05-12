@@ -5,35 +5,39 @@ export type Prettify<T> = {
 } & {};
 
 export type Conditions<T extends Record<string, any> = Record<string, any>> = T;
-export type RuleConditions<Context> = Conditions | ((context: Context) => Conditions);
+export type RuleConditions<Context> =
+  | Conditions
+  | ((context: Context) => Conditions);
 
 export interface RuleEntry<
   Context,
   Conditions extends RuleConditions<Context>
 > {
   id?: string;
-  
+
   action: string;
   subject: string;
-  
+
   fields?: string[];
   isInverted?: boolean;
-  
+
   conditions: Conditions;
 }
 
-export type RuleMap<
-  Context,
-  Conditions extends RuleConditions<Context>
-> = Map<bigint, RuleEntry<Context, Conditions>>;
+export type RuleMap<Context, Conditions extends RuleConditions<Context>> = Map<
+  bigint,
+  RuleEntry<Context, Conditions>
+>;
 
 export type WithSubjectType<T> = T & {
   subject: SubjectType | SubjectType[];
 };
 
-export type Ability = Prettify<AnyAbility & {
-  rules: WithSubjectType<AnyAbility["rules"][number]>[];
-}>
+export type Ability = Prettify<
+  AnyAbility & {
+    rules: WithSubjectType<AnyAbility["rules"][number]>[];
+  }
+>;
 
 export interface AbilityOptions {
   /** Фабрика для создания ability (по умолчанию createMongoAbility) */

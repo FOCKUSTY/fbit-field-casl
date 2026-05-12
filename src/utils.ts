@@ -24,7 +24,7 @@ export const resolveRuleConditions = <
   const Conditions extends RuleConditions<Context>
 >({
   rule,
-  context,
+  context
 }: {
   rule: RuleEntry<Context, Conditions>;
   context: any;
@@ -36,13 +36,7 @@ export const resolveRuleConditions = <
   return rule.conditions;
 };
 
-export const isBitValid = ({
-  bit,
-  bits,
-}: {
-  bits: bigint;
-  bit: bigint;
-}) => {
+export const isBitValid = ({ bit, bits }: { bits: bigint; bit: bigint }) => {
   if (!(bits & bit)) {
     return false;
   }

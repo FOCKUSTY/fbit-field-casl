@@ -34,9 +34,14 @@ const ruleMap = generateRuleMap([
     id: "update:own",
     action: "update",
     subject: "Article",
-    conditions: (context) => ({ authorId: context.userId }),
+    conditions: (context) => ({ authorId: context.userId })
   },
-  { id: "delete:any", action: "delete", subject: "Article", isInverted: true },
+  {
+    id: "delete:any",
+    action: "delete",
+    subject: "Article",
+    isInverted: true
+  }
 ]);
 ```
 
@@ -45,7 +50,7 @@ const ruleMap = generateRuleMap([
 ```ts
 const additionalMap = generateRuleMap(
   [{ id: "manage:settings", action: "manage", subject: "Settings" }],
-  { offset: ruleMap },
+  { offset: ruleMap }
 ); // новые биты начнутся после старых
 ```
 
@@ -56,7 +61,7 @@ import { createAbilityFromBits } from "@fbit-field/casl";
 
 const userBits = 1n | 4n; // read + update:own
 const ability = createAbilityFromBits(userBits, ruleMap, {
-  context: { userId: 42 },
+  context: { userId: 42 }
 });
 
 // Проверка прав
@@ -92,13 +97,13 @@ const readable = bitsToRulesList(userBits, ruleMap, { userId: 42 });
 // Создание токена
 const tokenPayload = {
   userId: 42,
-  permissions: userBits.toString(), // bigint → строка (JSON-совместимо)
+  permissions: userBits.toString() // bigint → строка (JSON-совместимо)
 };
 
 // Восстановление на сервере
 const bitsFromToken = BigInt(tokenPayload.permissions);
 const userAbility = createAbilityFromBits(bitsFromToken, ruleMap, {
-  context: { userId: tokenPayload.userId },
+  context: { userId: tokenPayload.userId }
 });
 ```
 
@@ -149,7 +154,9 @@ export interface RuleEntry {
   action: string;
   subject: string;
   id?: string;
-  conditions?: Record<string, any> | ((context: any) => Record<string, any>);
+  conditions?:
+    | Record<string, any>
+    | ((context: any) => Record<string, any>);
   fields?: string[];
   isInverted?: boolean;
 }
@@ -157,7 +164,7 @@ export interface RuleEntry {
 
 ## Юридические условия
 
-Проект распространяется под лицензией **MIT** (см. файл [LICENSE](./LICENSE)).  
+Проект распространяется под лицензией **MIT** (см. файл [LICENSE](./LICENSE)).
 
 **Для контрибьюторов:**  
 Любой код, отправленный в этот проект, дополнительно регулируется **Contributor License Agreement (CLA)** ([CLA.md](./CLA.md)).  
