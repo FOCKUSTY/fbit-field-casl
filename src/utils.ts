@@ -1,5 +1,5 @@
+import type { RuleEntry } from "./types";
 import { Bit, BitField, BitFieldOperations } from "fbit-field";
-import type { RuleConditions, RuleEntry } from "./types";
 
 /**
  * Извлекает значение bigint из переданных данных.
@@ -21,12 +21,11 @@ export const defaultBitsSort = (a: bigint, b: bigint): number => {
 
 export const resolveRuleConditions = <
   const Context,
-  const Conditions extends RuleConditions<Context>
 >({
   rule,
   context
 }: {
-  rule: RuleEntry<Context, Conditions>;
+  rule: RuleEntry<Context>;
   context: any;
 }) => {
   if (typeof rule.conditions === "function") {

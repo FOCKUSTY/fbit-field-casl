@@ -1,11 +1,11 @@
+import type { RawRule } from "@casl/ability";
 import type {
   Ability,
-  AbilityToBitsOptions,
+  AbilityTransformerOptions,
   RuleConditions,
   RuleEntry,
   RuleMap
 } from "./types";
-import type { RawRule } from "@casl/ability";
 
 import { ZERO_BIT } from "fbit-field";
 import { RULE_ID_KEY } from "./constants";
@@ -13,14 +13,13 @@ import { areArraysEqual } from "./utils";
 
 export class AbilityTransformer<
   const Context,
-  const Conditions extends RuleConditions<Context>
 > {
   public constructor(
     public readonly ability: Ability,
-    public readonly ruleMap: RuleMap<Context, Conditions>
+    public readonly ruleMap: RuleMap<Context>
   ) {}
 
-  public execute(options: AbilityToBitsOptions = {}): bigint {
+  public execute(options: AbilityTransformerOptions = {}): bigint {
     let result = ZERO_BIT;
 
     for (const rule of this.ability.rules) {
@@ -36,7 +35,7 @@ export class AbilityTransformer<
   }
 
   public isRuleMatchindRawRule(
-    rule: RuleEntry<Context, Conditions>,
+    rule: RuleEntry<Context>,
     rawRule: RawRule
   ) {
     if (rule.action !== rawRule.action) {
@@ -74,7 +73,7 @@ export class AbilityTransformer<
       rule
     }: {
       bit: bigint;
-      rule: RuleEntry<Context, Conditions>;
+      rule: RuleEntry<Context>;
     }) => boolean
   ) {
     const candidates = this.mapRuleMap((bit, rule) => {
@@ -99,7 +98,7 @@ export class AbilityTransformer<
   }
 
   private mapRuleMap<const T, const K>(
-    callback: (bit: bigint, rule: RuleEntry<Context, Conditions>) => T | K,
+    callback: (bit: bigint, rule: RuleEntry<Context>) => T | K,
     filterValue: K
   ) {
     const array: Exclude<T, K>[] = [];
@@ -137,7 +136,7 @@ export class AbilityTransformer<
     return conditions.__ruleId as string;
   }
 
-  private findBitForRule(rule: RawRule, options: AbilityToBitsOptions) {
+  private findBitForRule(rule: RawRule, options: AbilityTransformerOptions) {
     if (options.isStrict) {
       throw new Error(
         `Ambiguous rule mapping: multiple bits found for rule ${rule.action} ${rule.subject}`

@@ -1,17 +1,17 @@
 import type { AnyAbility, SubjectType } from "@casl/ability";
+import { BitFieldInput } from "fbit-field";
 
 export type Prettify<T> = {
   [P in keyof T]: T[P];
 } & {};
 
-export type Conditions<T extends Record<string, any> = Record<string, any>> = T;
+export type Conditions = Record<string, any>;
 export type RuleConditions<Context> =
   | Conditions
   | ((context: Context) => Conditions);
 
 export interface RuleEntry<
   Context,
-  Conditions extends RuleConditions<Context>
 > {
   id?: string;
 
@@ -21,12 +21,12 @@ export interface RuleEntry<
   fields?: string[];
   isInverted?: boolean;
 
-  conditions: Conditions;
+  conditions?: RuleConditions<Context>;
 }
 
-export type RuleMap<Context, Conditions extends RuleConditions<Context>> = Map<
+export type RuleMap<Context> = Map<
   bigint,
-  RuleEntry<Context, Conditions>
+  RuleEntry<Context>
 >;
 
 export type WithSubjectType<T> = T & {
@@ -39,17 +39,28 @@ export type Ability = Prettify<
   }
 >;
 
-export interface AbilityOptions {
+export type AbilityOptions = {
   /** Фабрика для создания ability (по умолчанию createMongoAbility) */
   abilityFactory?: () => Ability;
   context?: Record<string, any>;
   sortBits?: (a: bigint, b: bigint) => number;
 }
 
-export interface AbilityToBitsOptions {
+export type AbilityTransformerOptions = {
   /**
    * Если true, при неоднозначности выбрасывается ошибка.
    * Иначе выбирается бит с наименьшим значением.
    */
   isStrict?: boolean;
+}
+
+export type RawRuleMap<
+  Context,
+> = Map<bigint, RuleEntry<Context>>;
+
+export type RuleMapType<
+  Context,
+> = {
+  offset: BitFieldInput | RawRuleMap<Context> | RuleMapType<Context>;
+  map: RawRuleMap<Context>;
 }

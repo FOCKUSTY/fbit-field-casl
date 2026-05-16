@@ -2,7 +2,6 @@ import type { BitFieldInput } from "fbit-field";
 import type { RawRule } from "@casl/ability";
 import type {
   AbilityOptions,
-  RuleConditions,
   RuleEntry,
   RuleMap,
   WithSubjectType,
@@ -10,21 +9,18 @@ import type {
 } from "./types";
 
 import { createMongoAbility } from "@casl/ability";
+import { ZERO_BIT } from "fbit-field";
 import {
   defaultBitsSort,
   extractBigInt,
   isBitValid,
   resolveRuleConditions
 } from "./utils";
-import { ZERO_BIT } from "fbit-field";
 
-export class AbilityCreator<
-  const Context,
-  const Conditions extends RuleConditions<Context>
-> {
+export class AbilityCreator<const Context> {
   public constructor(
     public readonly bits: BitFieldInput,
-    public readonly ruleMap: RuleMap<Context, Conditions>
+    public readonly ruleMap: RuleMap<Context>
   ) {}
 
   public execute(
@@ -84,7 +80,7 @@ export class AbilityCreator<
   }
 
   private createRawRule(
-    rule: RuleEntry<Context, Conditions>,
+    rule: RuleEntry<Context>,
     context?: AbilityOptions["context"]
   ): RawRule {
     const conditions = (() => {
