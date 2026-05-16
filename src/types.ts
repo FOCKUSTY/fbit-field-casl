@@ -10,9 +10,7 @@ export type RuleConditions<Context> =
   | Conditions
   | ((context: Context) => Conditions);
 
-export interface RuleEntry<
-  Context,
-> {
+export interface RuleEntry<Context> {
   id?: string;
 
   action: string;
@@ -24,10 +22,7 @@ export interface RuleEntry<
   conditions?: RuleConditions<Context>;
 }
 
-export type RuleMap<Context> = Map<
-  bigint,
-  RuleEntry<Context>
->;
+export type RuleMap<Context> = Map<bigint, RuleEntry<Context>>;
 
 export type WithSubjectType<T> = T & {
   subject: SubjectType | SubjectType[];
@@ -44,7 +39,7 @@ export type AbilityOptions = {
   abilityFactory?: () => Ability;
   context?: Record<string, any>;
   sortBits?: (a: bigint, b: bigint) => number;
-}
+};
 
 export type AbilityTransformerOptions = {
   /**
@@ -52,15 +47,11 @@ export type AbilityTransformerOptions = {
    * Иначе выбирается бит с наименьшим значением.
    */
   isStrict?: boolean;
-}
+};
 
-export type RawRuleMap<
-  Context,
-> = Map<bigint, RuleEntry<Context>>;
+export type RawRuleMap<Context> = Map<bigint, RuleEntry<Context>>;
 
-export type RuleMapType<
-  Context,
-> = {
+export type RuleMapType<Context> = {
   offset: BitFieldInput | RawRuleMap<Context> | RuleMapType<Context>;
   map: RawRuleMap<Context>;
-}
+};

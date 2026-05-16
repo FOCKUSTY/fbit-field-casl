@@ -11,9 +11,7 @@ import { ZERO_BIT } from "fbit-field";
 import { RULE_ID_KEY } from "./constants";
 import { areArraysEqual } from "./utils";
 
-export class AbilityTransformer<
-  const Context,
-> {
+export class AbilityTransformer<const Context> {
   public constructor(
     public readonly ability: Ability,
     public readonly ruleMap: RuleMap<Context>
@@ -34,10 +32,7 @@ export class AbilityTransformer<
     return result;
   }
 
-  public isRuleMatchindRawRule(
-    rule: RuleEntry<Context>,
-    rawRule: RawRule
-  ) {
+  public isRuleMatchindRawRule(rule: RuleEntry<Context>, rawRule: RawRule) {
     if (rule.action !== rawRule.action) {
       return false;
     }

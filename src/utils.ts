@@ -19,9 +19,7 @@ export const defaultBitsSort = (a: bigint, b: bigint): number => {
   return 0;
 };
 
-export const resolveRuleConditions = <
-  const Context,
->({
+export const resolveRuleConditions = <const Context>({
   rule,
   context
 }: {

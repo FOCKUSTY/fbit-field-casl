@@ -1,12 +1,10 @@
 import type { RawRuleMap, RuleEntry, RuleMapType } from "./types";
 import { BitField, BitBuilder, BitFieldOperations, ZERO_BIT } from "fbit-field";
 
-export class RuleMap<
-  const Context,
-> implements RuleMapType<Context> {
+export class RuleMap<const Context> implements RuleMapType<Context> {
   public static create<const Context>(
     rules: RuleEntry<Context>[],
-    offset: RuleMapType<Context>["offset"] = ZERO_BIT 
+    offset: RuleMapType<Context>["offset"] = ZERO_BIT
   ) {
     return new RuleMap<Context>(offset).execute(rules);
   }
@@ -14,10 +12,8 @@ export class RuleMap<
   public readonly offset: bigint;
 
   private _map: RawRuleMap<Context> = new Map();
-  
-  public constructor(
-    offset: RuleMapType<Context>["offset"] = ZERO_BIT
-  ) {
+
+  public constructor(offset: RuleMapType<Context>["offset"] = ZERO_BIT) {
     this.offset = this.resolveOffset(offset);
   }
 
@@ -53,7 +49,7 @@ export class RuleMap<
 
     if (
       typeof offset === "bigint" ||
-      typeof offset === "string" || 
+      typeof offset === "string" ||
       typeof offset === "number" ||
       typeof offset === "boolean"
     ) {
