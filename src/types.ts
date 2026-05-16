@@ -22,8 +22,6 @@ export interface RuleEntry<Context> {
   conditions?: RuleConditions<Context>;
 }
 
-export type RuleMap<Context> = Map<bigint, RuleEntry<Context>>;
-
 export type WithSubjectType<T> = T & {
   subject: SubjectType | SubjectType[];
 };

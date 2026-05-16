@@ -4,7 +4,7 @@ import type {
   AbilityTransformerOptions,
   RuleConditions,
   RuleEntry,
-  RuleMap
+  RawRuleMap
 } from "./types";
 
 import { ZERO_BIT } from "fbit-field";
@@ -14,7 +14,7 @@ import { areArraysEqual } from "./utils";
 export class AbilityTransformer<const Context> {
   public constructor(
     public readonly ability: Ability,
-    public readonly ruleMap: RuleMap<Context>
+    public readonly ruleMap: RawRuleMap<Context>
   ) {}
 
   public execute(options: AbilityTransformerOptions = {}): bigint {

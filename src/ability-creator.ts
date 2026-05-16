@@ -3,7 +3,7 @@ import type { RawRule } from "@casl/ability";
 import type {
   AbilityOptions,
   RuleEntry,
-  RuleMap,
+  RawRuleMap,
   WithSubjectType,
   Ability
 } from "./types";
@@ -20,7 +20,7 @@ import {
 export class AbilityCreator<const Context> {
   public constructor(
     public readonly bits: BitFieldInput,
-    public readonly ruleMap: RuleMap<Context>
+    public readonly ruleMap: RawRuleMap<Context>
   ) {}
 
   public execute(
